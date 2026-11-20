@@ -36,6 +36,11 @@ jobs:
           unzip -l "$APK" | grep -q 'classes.dex'
           unzip -p "$APK" classes.dex > /tmp/classes.dex
           test -s /tmp/classes.dex
+          $ANDROID_HOME/build-tools/35.0.0/aapt dump badging "$APK" | grep -q "package: name='com.mineload.app'"
+          $ANDROID_HOME/build-tools/35.0.0/apksigner verify --verbose "$APK"
+          sha256sum "$APK"
+      - name: Run Android lint
+        run: gradle lintDebug
       - name: Create source backup
         run: zip -r MineLoad-source-backup.zip . -x '.git/*' 'MineLoad-source-backup.zip'
       - name: Upload APK
