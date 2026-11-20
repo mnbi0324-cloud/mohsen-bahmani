@@ -10,5 +10,5 @@ class DB extends SQLiteOpenHelper{
  boolean isAdmin(String u){Cursor c=getReadableDatabase().rawQuery("SELECT admin FROM users WHERE username=?",new String[]{u});boolean a=c.moveToFirst()&&c.getInt(0)==1;c.close();return a;}
  boolean addUser(String u,String p,boolean a){ContentValues v=new ContentValues();v.put("username",u);v.put("hash",hash(p));v.put("admin",a?1:0);return getWritableDatabase().insert("users",null,v)!=-1;}
  void add(String t,String u,String payload){ContentValues v=new ContentValues();v.put("tbl",t);v.put("username",u);v.put("payload",payload);getWritableDatabase().insert("records",null,v);}
- Cursor list(String t){if(t.equals("users"))return getReadableDatabase().rawQuery("SELECT id,username,admin,created FROM users",null);return getReadableDatabase().rawQuery("SELECT id,username,payload,created FROM records WHERE tbl=? ORDER BY id DESC",new String[]{t});}
+ Cursor list(String t){if(t.equals("users"))return getReadableDatabase().rawQuery("SELECT id,username,admin FROM users ORDER BY id",null);return getReadableDatabase().rawQuery("SELECT id,username,payload,created FROM records WHERE tbl=? ORDER BY id DESC",new String[]{t});}
 }
