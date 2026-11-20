@@ -42,8 +42,9 @@ jobs:
           test -n "$ZIP_FILE"
           mkdir extracted
           unzip -q "$ZIP_FILE" -d extracted
+          test -f extracted/MineLoadAndroid/app/src/main/java/com/mineload/app/MainActivity.kt
 
-      - name: Fix Kotlin plugin configuration
+      - name: Fix Kotlin plugin and JVM targets
         run: |
           cd extracted/MineLoadAndroid
           cat > build.gradle <<'EOF'
@@ -67,6 +68,13 @@ jobs:
                   targetSdk 35
                   versionCode 2
                   versionName '1.1'
+              }
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
+              kotlinOptions {
+                  jvmTarget = '17'
               }
           }
           EOF
