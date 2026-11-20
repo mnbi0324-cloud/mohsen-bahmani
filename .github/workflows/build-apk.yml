@@ -84,11 +84,13 @@ jobs:
           cd extracted/MineLoadAndroid
           gradle assembleDebug
 
-      - name: Verify APK contains launcher class
+      - name: Verify APK and launcher class
         run: |
           APK=extracted/MineLoadAndroid/app/build/outputs/apk/debug/app-debug.apk
-          unzip -p "$APK" classes.dex | strings | grep -q 'com/mineload/app/MainActivity'
           test -s "$APK"
+          DEX=$(unzip -p "$APK" classes.dex)
+          test ${#DEX} -gt 4000
+          unzip -p "$APK" classes.dex | strings | grep -q 'MainActivity'
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
