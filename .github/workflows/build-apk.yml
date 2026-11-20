@@ -43,10 +43,44 @@ jobs:
           mkdir extracted
           unzip -q "$ZIP_FILE" -d extracted
 
+      - name: Fix Kotlin plugin configuration
+        run: |
+          cd extracted/MineLoadAndroid
+          cat > build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application' version '8.7.3' apply false
+              id 'org.jetbrains.kotlin.android' version '2.0.21' apply false
+          }
+          EOF
+          cat > app/build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application'
+              id 'org.jetbrains.kotlin.android'
+          }
+
+          android {
+              namespace 'com.mineload.app'
+              compileSdk 35
+              defaultConfig {
+                  applicationId 'com.mineload.app'
+                  minSdk 23
+                  targetSdk 35
+                  versionCode 2
+                  versionName '1.1'
+              }
+          }
+          EOF
+
       - name: Build APK
         run: |
           cd extracted/MineLoadAndroid
           gradle assembleDebug
+
+      - name: Verify APK contains launcher class
+        run: |
+          APK=extracted/MineLoadAndroid/app/build/outputs/apk/debug/app-debug.apk
+          unzip -p "$APK" classes.dex | strings | grep -q 'com/mineload/app/MainActivity'
+          test -s "$APK"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
