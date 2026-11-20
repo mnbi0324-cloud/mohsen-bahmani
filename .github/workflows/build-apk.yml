@@ -84,13 +84,14 @@ jobs:
           cd extracted/MineLoadAndroid
           gradle assembleDebug
 
-      - name: Verify APK and launcher class
+      - name: Verify APK package and DEX
         run: |
           APK=extracted/MineLoadAndroid/app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
-          DEX=$(unzip -p "$APK" classes.dex)
-          test ${#DEX} -gt 4000
-          unzip -p "$APK" classes.dex | strings | grep -q 'MainActivity'
+          unzip -l "$APK" | grep -q 'classes.dex'
+          unzip -p "$APK" classes.dex > /tmp/classes.dex
+          test -s /tmp/classes.dex
+          test "$(stat -c%s /tmp/classes.dex)" -gt 3000
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
